@@ -53,6 +53,16 @@ translate([70, 0, 2.5])
 
 color("white")
 {
+    // lug
+    translate([83, 0, 0])
+    {
+        difference()
+        {
+            cylinder(h = 5, d = 5, center = true);
+            cylinder(h = 6, d = 2, center = true);
+        }
+    }
+
     hull()
     {
         translate([6, 14, 0])

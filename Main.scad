@@ -1,37 +1,33 @@
-$fn=360;
+
+body_color = "White"; // [Black, Blue, Brown, Chartreuse, Green, Magenta, Orange, Purple, Red, Teal, Violet, White, Yellow]
+drawing_color = "Black"; // [Black, Blue, Brown, Chartreuse, Green, Magenta, Orange, Purple, Red, Teal, Violet, White, Yellow]
 
 chamfer = false;
 rounding = 1.2;
 
 /* [Hidden] */
 delta = 0.01;
+$fn=360;
 
-// buttons
-color("black")
+
+color(drawing_color)
 translate([0, 0, 5])
 {
+    // buttons
     translate([10, 0, 0])
         cylinder(h=1, d = 5);
     translate([30, 0, 0])
         cylinder(h=1, d = 5);    
     translate([50, 0, 0])
         cylinder(h=1, d = 5);
-};
 
-//eyes
-color("black")
-translate([0, 0, 5])
-{
+    //eyes
     translate([73, 5, 0])
         cylinder(h=1, d = 3);
     translate([73, -5, 0])
         cylinder(h=1, d = 3);
-};
 
-// lips
-color("black")
-translate([0, 0, 5])
-{
+    // lips
     translate([74, 0, 0])
     {
         intersection()
@@ -57,7 +53,7 @@ translate([70, 0, 5])
     cylinder(h = 10, d1 = 5, d2 = 0);
 }*/
 
-color("white")
+color(body_color)
 {
     // lug
     translate([82.5, 0, 0])

@@ -51,7 +51,7 @@ translate([70, 0, 2.5])
     cylinder(h = 10, d1 = 5, d2 = 0);
 }*/
 
-//color("white")
+color("white")
 {
     hull()
     {
@@ -65,8 +65,6 @@ translate([70, 0, 2.5])
     {
         // bottom
         cylinder(h = 5, d = 40, center = true);
-        
-        
 
         translate([27, 0, 0])
         {

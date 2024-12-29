@@ -4,12 +4,14 @@ drawing_color = "Black"; // [Black, Blue, Brown, Chartreuse, Green, Magenta, Ora
 
 chamfer = false;
 rounding = 1.2;
+show_drawing = true;
+show_lug = true;
 
 /* [Hidden] */
 delta = 0.01;
 $fn=360;
 
-
+if (show_drawing)
 color(drawing_color)
 translate([0, 0, 5])
 {
@@ -44,18 +46,19 @@ translate([0, 0, 5])
                 cube([25, 25, 25]);
         }
     }
+
+    // nose
+    /*translate([70, 0, 0])
+    {
+        cylinder(h = 1, d = 5);
+    }*/
 };
 
-/*// nose
-color("black")
-translate([70, 0, 5])
-{
-    cylinder(h = 10, d1 = 5, d2 = 0);
-}*/
 
 color(body_color)
 {
     // lug
+    if (show_lug)
     translate([82.5, 0, 0])
     {
         difference()

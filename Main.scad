@@ -1,5 +1,8 @@
 $fn=360;
 
+chamfer = false;
+rounding = 1.2;
+
 /* [Hidden] */
 delta = 0.01;
 
@@ -57,43 +60,59 @@ translate([70, 0, 5])
 color("white")
 {
     // lug
-    translate([83, 0, 0])
+    translate([82.5, 0, 0])
     {
         difference()
         {
             cylinder(h = 5, d = 5);
             translate([0, 0, -delta])
-            cylinder(h = 5 + 2 * delta, d = 2);
+                cylinder(h = 5 + 2 * delta, d = 2);
         }
     }
 
     hull()
     {
         translate([6, 14, 0])
-            cylinder(h = 5, d = 12);
-    translate([6, -14, 0])
-        cylinder(h = 5, d = 12);
+            my_cylinder(h = 5, d = 12);
+        translate([6, -14, 0])
+            my_cylinder(h = 5, d = 12);
     }
             
     translate([20, 0, 0])
     {
         // bottom
-        cylinder(h = 5, d = 40);
+        my_cylinder(h = 5, d = 40);
 
         translate([27, 0, 0])
         {
             // medium
-            cylinder(h = 5, d = 30);
+            my_cylinder(h = 5, d = 30);
             
             // "hands"
             translate([3, 16, 0])
-                cylinder(h = 5, d = 10);
+                my_cylinder(h = 5, d = 10);
             translate([3, -16, 0])
-                cylinder(h = 5, d = 10);
+                my_cylinder(h = 5, d = 10);
             
             // "head"
             translate([23, 0, 0])
-                cylinder(h = 5, d = 23);
+                my_cylinder(h = 5, d = 23);
         }
+    }
+}
+
+module my_cylinder(h, d)
+{
+    if (chamfer)
+    {
+        cylinder(h=rounding, d1 = d - 2 * rounding, d2 = d);
+        translate([0, 0, rounding])
+            cylinder(h = h - 2 * rounding, d = d);
+        translate([0, 0, h - rounding])
+            cylinder(h=rounding, d1 = d, d2 = d - 2 * rounding);
+    }
+    else
+    {
+        cylinder(h=h, d = d);
     }
 }

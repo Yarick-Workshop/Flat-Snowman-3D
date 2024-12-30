@@ -1,6 +1,6 @@
 # Flat Snowman/Snow woman 3D Model
 <p align="center" width="100%">
-    <img width="80%" src="media/logo.png">
+    <img width="40%" src="media/logo.png">
 </p>
 
 The 3D model was designed to be produced on a 3D printer. It is easy to print and doesn't require any supports.

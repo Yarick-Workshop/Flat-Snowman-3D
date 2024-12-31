@@ -24,8 +24,8 @@ The 3D model was designed to be produced on a 3D printer. It is easy to print an
 This 3D model is highly customizable. So you can configure it for you needs.
 
 If you do not need any customizations and would only like to have the same **Snowman Christmas tree decoration**  as I have – you can download prerendered STL files: 
- * https://t.me/YarickWorkshop/579 - with chamfers;
- * https://t.me/YarickWorkshop/580 - angular version.
+ * https://t.me/YarickWorkshop/581 - with chamfers;
+ * https://t.me/YarickWorkshop/582 - angular version.
 
 There are the following options to get a colored model:
   * Use a multi-color 3D printer;

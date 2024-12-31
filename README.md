@@ -34,7 +34,7 @@ There are the following options to get a colored model:
   
 ## Contact me
 To follow the progress go to my channels:
-  - Telegram: [https://t.me/YarickWorkshop](https://t.me/YarickWorkshop)
+  - Telegram: https://t.me/YarickWorkshop/580
   - YouTube: https://www.youtube.com/@yarick-workshop
 
 Yeah, they both are in Russian, but **if you have any questions** – contact me in either Telegram channel (see above) or Mail: techno.man.983@gmail.com. I can communicate in English without any problems. 

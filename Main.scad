@@ -2,58 +2,66 @@
 body_color = "White"; // [Black, Blue, Brown, Chartreuse, Green, Magenta, Orange, Purple, Red, Teal, Violet, White, Yellow]
 drawing_color = "Black"; // [Black, Blue, Brown, Chartreuse, Green, Magenta, Orange, Purple, Red, Teal, Violet, White, Yellow]
 
+show_lug = true;
+
+/* [Drawing] */
+show_drawing = true;
+buttons_diameter = 5;
+eyes_diameter = 3;
+lips_thickness = 2;
+
+/* [Rounding] */
 chamfer = false;
 rounding = 1.2;
-show_drawing = true;
-show_lug = true;
 
 /* [Hidden] */
 delta = 0.01;
 $fn=360;
 
 if (show_drawing)
-color(drawing_color)
-translate([0, 0, 5])
 {
-    // buttons
-    translate([10, 0, 0])
-        cylinder(h=1, d = 5);
-    translate([30, 0, 0])
-        cylinder(h=1, d = 5);    
-    translate([50, 0, 0])
-        cylinder(h=1, d = 5);
-
-    //eyes
-    translate([73, 5, 0])
-        cylinder(h=1, d = 3);
-    translate([73, -5, 0])
-        cylinder(h=1, d = 3);
-
-    // lips
-    translate([74, 0, 0])
+    color(drawing_color)
+    translate([0, 0, 5])
     {
-        intersection()
+        // buttons
+        translate([10, 0, 0])
+            cylinder(h=1, d = buttons_diameter);
+        translate([30, 0, 0])
+            cylinder(h=1, d = buttons_diameter);    
+        translate([50, 0, 0])
+            cylinder(h=1, d = buttons_diameter);
+
+        //eyes
+        translate([73, 5, 0])
+            cylinder(h=1, d = eyes_diameter);
+        translate([73, -5, 0])
+            cylinder(h=1, d = eyes_diameter);
+
+        // lips
+        translate([74, 0, 0])
         {
-            difference()
+            intersection()
             {
-                cylinder(h = 1, d = 20);
-                translate([0, 0, -delta])
+                difference()
                 {
-                    cylinder(h = 1 + 2 * delta, d = 18);
+                    cylinder(h = 1, d = 20);
+                    translate([0, 0, -delta])
+                    {
+                        cylinder(h = 1 + 2 * delta, d = 18);
+                    }
                 }
+                rotate(135)
+                    cube([25, 25, 25]);
             }
-            rotate(135)
-                cube([25, 25, 25]);
         }
-    }
 
-    // nose
-    /*translate([70, 0, 0])
-    {
-        cylinder(h = 1, d = 5);
-    }*/
-};
-
+        // nose
+        /*translate([70, 0, 0])
+        {
+            cylinder(h = 1, d = 5);
+        }*/
+    };
+}
 
 color(body_color)
 {

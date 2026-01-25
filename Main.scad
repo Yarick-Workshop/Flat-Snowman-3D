@@ -6,6 +6,7 @@ show_lug = true;
 
 /* [Drawing] */
 show_drawing = true;
+drawing_height = 1;
 buttons_diameter = 5;
 eyes_diameter = 3;
 lips_thickness = 1;
@@ -16,7 +17,11 @@ rounding = 1.2;
 
 /* [Hidden] */
 delta = 0.01;
-$fn=36;
+$fn = 360;
+
+// Validations
+assert(drawing_height > 0, "drawing_height must be greater than zero");
+assert(lips_thickness > 0, "lips_thickness must be greater than zero");
 
 if (show_drawing)
 {
@@ -25,23 +30,20 @@ if (show_drawing)
     {
         // buttons
         translate([10, 0, 0])
-            cylinder(h=1, d = buttons_diameter);
+            cylinder(h = drawing_height, d = buttons_diameter);
         translate([30, 0, 0])
-            cylinder(h=1, d = buttons_diameter);    
+            cylinder(h = drawing_height, d = buttons_diameter);    
         translate([50, 0, 0])
-            cylinder(h=1, d = buttons_diameter);
+            cylinder(h = drawing_height, d = buttons_diameter);
 
         // eyes
         translate([73, 5, 0])
-            cylinder(h=1, d = eyes_diameter);
+            cylinder(h = drawing_height, d = eyes_diameter);
         translate([73, -5, 0])
-            cylinder(h=1, d = eyes_diameter);
+            cylinder(h = drawing_height, d = eyes_diameter);
 
         // lips
         lips();
-
-        // intersection_for example (uncomment to preview)
-        //intersection_for_example();
 
         // nose
         /*translate([70, 0, 0])
@@ -103,7 +105,7 @@ module lips()
         rotate([0, 0, 135])
         rotate_extrude(angle = 90)
             translate([10 - lips_thickness, 0])
-                square([lips_thickness, 1], center = false);
+                square([lips_thickness, drawing_height], center = false);
     }
 }
 

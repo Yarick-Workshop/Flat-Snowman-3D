@@ -8,7 +8,7 @@ show_lug = true;
 show_drawing = true;
 buttons_diameter = 5;
 eyes_diameter = 3;
-lips_thickness = 2;
+lips_thickness = 1;
 
 /* [Rounding] */
 chamfer = false;
@@ -16,7 +16,7 @@ rounding = 1.2;
 
 /* [Hidden] */
 delta = 0.01;
-$fn=360;
+$fn=36;
 
 if (show_drawing)
 {
@@ -31,29 +31,17 @@ if (show_drawing)
         translate([50, 0, 0])
             cylinder(h=1, d = buttons_diameter);
 
-        //eyes
+        // eyes
         translate([73, 5, 0])
             cylinder(h=1, d = eyes_diameter);
         translate([73, -5, 0])
             cylinder(h=1, d = eyes_diameter);
 
         // lips
-        translate([74, 0, 0])
-        {
-            intersection()
-            {
-                difference()
-                {
-                    cylinder(h = 1, d = 20);
-                    translate([0, 0, -delta])
-                    {
-                        cylinder(h = 1 + 2 * delta, d = 18);
-                    }
-                }
-                rotate(135)
-                    cube([25, 25, 25]);
-            }
-        }
+        lips();
+
+        // intersection_for example (uncomment to preview)
+        //intersection_for_example();
 
         // nose
         /*translate([70, 0, 0])
@@ -104,6 +92,51 @@ color(body_color)
             // "head"
             translate([23, 0, 0])
                 my_cylinder(h = 5, d = 23);
+        }
+    }
+}
+
+module lips()
+{
+    translate([74, 0, 0])
+    {
+        rotate([0, 0, 135])
+        rotate_extrude(angle = 90)
+            translate([10 - lips_thickness, 0])
+                square([lips_thickness, 1], center = false);
+    }
+}
+
+module xor()
+{
+    assert($children == 2, "xor() requires exactly 2 children");
+
+    difference()
+    {
+        union()
+        {
+            children(0);
+            children(1);
+        }
+        intersection()
+        {
+            children(0);
+            children(1);
+        }
+    }
+}
+
+module chain_hull_children()
+{
+    if ($children > 1)
+    {
+        for (i = [0 : $children - 2])
+        {
+            hull()
+            {
+                children(i);
+                children(i + 1);
+            }
         }
     }
 }

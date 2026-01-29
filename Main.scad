@@ -19,10 +19,14 @@ rounding = 1.2;
 /* [Hidden] */
 delta = 0.01;
 $fn = 360;
+lips_medium_offset_min = -2.9;
+lips_medium_offset_max = 2.9;
 
 // Validations
 assert(drawing_height > 0, "drawing_height must be greater than zero");
 assert(lips_thickness > 0, "lips_thickness must be greater than zero");
+assert(lips_medium_offset >= lips_medium_offset_min, str("lips_medium_offset must be >= ", lips_medium_offset_min));
+assert(lips_medium_offset <= lips_medium_offset_max, str("lips_medium_offset must be <= ", lips_medium_offset_max));
 
 if (show_drawing)
 {

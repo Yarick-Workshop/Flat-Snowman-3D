@@ -10,6 +10,7 @@ drawing_height = 1;
 buttons_diameter = 5;
 eyes_diameter = 3;
 lips_thickness = 1;
+lips_medium_offset = 2.9;
 
 /* [Rounding] */
 chamfer = false;
@@ -54,7 +55,7 @@ if (show_drawing)
 }
 
 color(body_color)
-{
+{    
     // lug
     if (show_lug)
     translate([82.5, 0, 0])
@@ -100,12 +101,29 @@ color(body_color)
 
 module lips()
 {
-    translate([74, 0, 0])
+    lips_width = 14.1;
+
+    translate([65.475, 0, 0])
     {
-        rotate([0, 0, 135])
-        rotate_extrude(angle = 90)
-            translate([10 - lips_thickness, 0])
-                square([lips_thickness, drawing_height], center = false);
+        if (lips_medium_offset == 0)
+        {
+            rotate([90, 0, 0])
+                linear_extrude(height = lips_width, center = true)
+                    square([lips_thickness, drawing_height], center = false);
+        }
+        else
+        {
+            lips_radius = lips_width * lips_width / (8 * lips_medium_offset) + lips_medium_offset / 2;
+            lips_offset = lips_radius - lips_medium_offset / 2;
+
+            lips_angle = atan(lips_width / 2 / (lips_radius - lips_medium_offset)) * 2;
+
+            translate([lips_offset, 0])
+                rotate([0, 0, 180 - lips_angle / 2])
+                    rotate_extrude(angle = lips_angle)
+                        translate([lips_radius - lips_thickness / 2, lips_thickness / 2])
+                            square([lips_thickness, drawing_height], center = true);
+        }
     }
 }
 

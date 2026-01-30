@@ -10,6 +10,7 @@ module Snowman(
     eyes_diameter,
     lips_thickness,
     lips_medium_offset,
+    animate_lips_medium_offset,
 
     chamfer,
     rounding
@@ -19,12 +20,22 @@ module Snowman(
     $fn = 360;
     lips_medium_offset_min = -2.9;
     lips_medium_offset_max = 2.9;
+    lips_medium_offset_range = lips_medium_offset_max - lips_medium_offset_min;
 
     // Validations
     assert(drawing_height > 0, "drawing_height must be greater than zero");
     assert(lips_thickness > 0, "lips_thickness must be greater than zero");
     assert(lips_medium_offset >= lips_medium_offset_min, str("lips_medium_offset must be >= ", lips_medium_offset_min));
     assert(lips_medium_offset <= lips_medium_offset_max, str("lips_medium_offset must be <= ", lips_medium_offset_max));
+
+// TODO, polish this formula
+    lips_medium_offset_value = animate_lips_medium_offset
+        ? (
+            ($t % 1) < 0.5
+                ? (lips_medium_offset_max - lips_medium_offset_range * (($t % 1) / 0.5))
+                : (lips_medium_offset_min + lips_medium_offset_range * ((($t % 1) - 0.5) / 0.5))
+          )
+        : lips_medium_offset;
 
     if (show_drawing)
     {
@@ -107,7 +118,7 @@ module Snowman(
 
         translate([65.475, 0, 0])
         {
-            if (lips_medium_offset == 0)
+            if (lips_medium_offset_value == 0)
             {
                 rotate([90, 0, 0])
                     linear_extrude(height = lips_width, center = true)
@@ -115,10 +126,10 @@ module Snowman(
             }
             else
             {
-                lips_radius = lips_width * lips_width / (8 * lips_medium_offset) + lips_medium_offset / 2;
-                lips_offset = lips_radius - lips_medium_offset / 2;
+                lips_radius = lips_width * lips_width / (8 * lips_medium_offset_value) + lips_medium_offset_value / 2;
+                lips_offset = lips_radius - lips_medium_offset_value / 2;
 
-                lips_angle = atan(lips_width / 2 / (lips_radius - lips_medium_offset)) * 2;
+                lips_angle = atan(lips_width / 2 / (lips_radius - lips_medium_offset_value)) * 2;
 
                 translate([lips_offset, 0])
                     rotate([0, 0, 180 - lips_angle / 2])

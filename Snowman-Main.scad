@@ -11,7 +11,7 @@ drawing_height = 1;
 buttons_diameter = 5;
 eyes_diameter = 3;
 lips_thickness = 1;
-lips_medium_offset = 2.9;
+mood = 1; // [-1:0.1:1]
 animate_lips_medium_offset = false;
 
 /* [Rounding] */
@@ -29,7 +29,7 @@ Snowman(
     buttons_diameter = buttons_diameter,
     eyes_diameter = eyes_diameter,
     lips_thickness = lips_thickness,
-    lips_medium_offset = lips_medium_offset,
+    mood = mood,
     animate_lips_medium_offset = animate_lips_medium_offset,
 
     chamfer = chamfer,

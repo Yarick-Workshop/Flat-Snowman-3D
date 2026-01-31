@@ -9,7 +9,7 @@ module Snowman(
     buttons_diameter,
     eyes_diameter,
     lips_thickness,
-    lips_medium_offset,
+    mood,
     animate_lips_medium_offset,
 
     chamfer,
@@ -25,8 +25,11 @@ module Snowman(
     // Validations
     assert(drawing_height > 0, "drawing_height must be greater than zero");
     assert(lips_thickness > 0, "lips_thickness must be greater than zero");
-    assert(lips_medium_offset >= lips_medium_offset_min, str("lips_medium_offset must be >= ", lips_medium_offset_min));
-    assert(lips_medium_offset <= lips_medium_offset_max, str("lips_medium_offset must be <= ", lips_medium_offset_max));
+    assert(mood >= -1, "mood must be >= -1");
+    assert(mood <= 1, "mood must be <= 1");
+
+    lips_medium_offset = lips_medium_offset_min
+        + (mood + 1) / 2 * lips_medium_offset_range;
 
 // TODO, polish this formula
     lips_medium_offset_value = animate_lips_medium_offset

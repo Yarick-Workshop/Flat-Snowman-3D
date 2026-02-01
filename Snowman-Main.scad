@@ -12,7 +12,7 @@ buttons_diameter = 5;
 eyes_diameter = 3;
 lips_thickness = 1;
 mood = 1; // [-1:0.1:1]
-animate_lips_medium_offset = false;
+mood_change_animation = false;
 
 /* [Rounding] */
 chamfer = false;
@@ -30,7 +30,7 @@ Snowman(
     eyes_diameter = eyes_diameter,
     lips_thickness = lips_thickness,
     mood = mood,
-    animate_lips_medium_offset = animate_lips_medium_offset,
+    mood_change_animation = mood_change_animation,
 
     chamfer = chamfer,
     rounding = rounding

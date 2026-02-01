@@ -10,7 +10,7 @@ module Snowman(
     eyes_diameter,
     lips_thickness,
     mood,
-    animate_lips_medium_offset,
+    mood_change_animation,
 
     chamfer,
     rounding
@@ -28,7 +28,7 @@ module Snowman(
     assert(mood >= -1, "mood must be >= -1");
     assert(mood <= 1, "mood must be <= 1");
 
-    mood_internal = animate_lips_medium_offset 
+    mood_internal = mood_change_animation 
         ? cos(360 * $t) 
         : mood;
 

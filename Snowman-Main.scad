@@ -18,6 +18,11 @@ mood_change_animation = false;
 chamfer = false;
 rounding = 1.2;
 
+
+mood_calculated = mood_change_animation 
+        ? cos(360 * $t) 
+        : mood;
+
 Snowman(
     body_color = body_color,
     drawing_color = drawing_color,
@@ -29,8 +34,7 @@ Snowman(
     buttons_diameter = buttons_diameter,
     eyes_diameter = eyes_diameter,
     lips_thickness = lips_thickness,
-    mood = mood,
-    mood_change_animation = mood_change_animation,
+    mood = mood_calculated,
 
     chamfer = chamfer,
     rounding = rounding

@@ -28,17 +28,16 @@ module Snowman(
     assert(mood >= -1, "mood must be >= -1");
     assert(mood <= 1, "mood must be <= 1");
 
-    lips_medium_offset = lips_medium_offset_min
-        + (mood + 1) / 2 * lips_medium_offset_range;
-
-// TODO, polish this formula
-    lips_medium_offset_value = animate_lips_medium_offset
+    mood_internal = animate_lips_medium_offset 
         ? (
-            ($t % 1) < 0.5
-                ? (lips_medium_offset_max - lips_medium_offset_range * (($t % 1) / 0.5))
-                : (lips_medium_offset_min + lips_medium_offset_range * ((($t % 1) - 0.5) / 0.5))
-          )
-        : lips_medium_offset;
+            $t < 0.5
+                ? (1 - 4 * $t)
+                : (4 * $t - 3)
+        ) 
+        : mood;
+
+    lips_medium_offset = lips_medium_offset_min
+        + (mood_internal + 1) / 2 * lips_medium_offset_range;
 
     if (show_drawing)
     {
@@ -121,7 +120,7 @@ module Snowman(
 
         translate([65.475, 0, 0])
         {
-            if (lips_medium_offset_value == 0)
+            if (lips_medium_offset == 0)
             {
                 rotate([90, 0, 0])
                     linear_extrude(height = lips_width, center = true)
@@ -129,10 +128,10 @@ module Snowman(
             }
             else
             {
-                lips_radius = lips_width * lips_width / (8 * lips_medium_offset_value) + lips_medium_offset_value / 2;
-                lips_offset = lips_radius - lips_medium_offset_value / 2;
+                lips_radius = lips_width * lips_width / (8 * lips_medium_offset) + lips_medium_offset / 2;
+                lips_offset = lips_radius - lips_medium_offset / 2;
 
-                lips_angle = atan(lips_width / 2 / (lips_radius - lips_medium_offset_value)) * 2;
+                lips_angle = atan(lips_width / 2 / (lips_radius - lips_medium_offset)) * 2;
 
                 translate([lips_offset, 0])
                     rotate([0, 0, 180 - lips_angle / 2])

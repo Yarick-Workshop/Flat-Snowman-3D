@@ -29,11 +29,7 @@ module Snowman(
     assert(mood <= 1, "mood must be <= 1");
 
     mood_internal = animate_lips_medium_offset 
-        ? (
-            $t < 0.5
-                ? (1 - 4 * $t)
-                : (4 * $t - 3)
-        ) 
+        ? cos(360 * $t) 
         : mood;
 
     lips_medium_offset = lips_medium_offset_min

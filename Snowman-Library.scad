@@ -109,26 +109,35 @@ module Snowman(
     {
         lips_width = 14.1;
 
+        module lips_arc(offset)
+        {
+            lips_radius = lips_width * lips_width / (8 * offset) + offset / 2;
+            lips_angle = atan(lips_width / 2 / (lips_radius - offset)) * 2;
+            lips_offset = lips_radius - offset / 2 - (lips_thickness / 2) * cos(lips_angle / 2);
+
+            translate([lips_offset, 0])
+                for (m = [0, 1])
+                    mirror([0, m, 0])
+                        rotate([0, 0, 180])
+                            rotate_extrude(angle = lips_angle / 2)
+                                translate([lips_radius - lips_thickness / 2, drawing_height / 2])
+                                    square([lips_thickness, drawing_height], center = true);
+        }
+
         translate([65.475, 0, 0])
         {
             if (lips_medium_offset == 0)
             {
-                rotate([90, 0, 0])
-                    linear_extrude(height = lips_width, center = true)
-                        square([lips_thickness, drawing_height], center = false);
+                translate([0, 0, drawing_height / 2])
+                    cube([lips_thickness, lips_width, drawing_height], center = true);
             }
             else
             {
-                lips_radius = lips_width * lips_width / (8 * lips_medium_offset) + lips_medium_offset / 2;
-                lips_offset = lips_radius - lips_medium_offset / 2;
-
-                lips_angle = atan(lips_width / 2 / (lips_radius - lips_medium_offset)) * 2;
-
-                translate([lips_offset, 0])
-                    rotate([0, 0, 180 - lips_angle / 2])
-                        rotate_extrude(angle = lips_angle)
-                            translate([lips_radius - lips_thickness / 2, lips_thickness / 2])
-                                square([lips_thickness, drawing_height], center = true);
+                if (lips_medium_offset > 0)
+                    lips_arc(lips_medium_offset);
+                else
+                    mirror([1, 0, 0])
+                        lips_arc(-lips_medium_offset);
             }
         }
     }

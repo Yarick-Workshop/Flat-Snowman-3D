@@ -3,12 +3,12 @@ use <Geometry-Helpers.scad>
 
 /* [Body] */
 body_color = "White"; // [Black, Blue, Brown, Chartreuse, Green, Magenta, Orange, Purple, Red, Teal, Violet, White, Yellow]
-body_height = 5;
-body_base_round_diameter = 12;
-body_bottom_diameter = 40;
-body_medium_diameter = 30;
-body_hands_diameter = 10;
-body_head_diameter = 23;
+body_height = 5; // .1
+body_base_round_diameter = 12; // .1
+body_bottom_diameter = 40; // .1
+body_medium_diameter = 30; // .1
+body_hands_diameter = 10; // .1
+body_head_diameter = 23; // .1
 
 /* [Rounding] */
 rounding_chamfer = false;
@@ -16,16 +16,16 @@ rounding_size = 1.2;
 
 /* [Lug] */
 lug_show = true;
-lug_diameter = 5;
-lug_hole_diameter = 2;
+lug_diameter = 5; // .1
+lug_hole_diameter = 2; // .1
 
 /* [Drawing] */
 drawing_show = true;
 drawing_color = "Black"; // [Black, Blue, Brown, Chartreuse, Green, Magenta, Orange, Purple, Red, Teal, Violet, White, Yellow]
-drawing_height = 1;
-drawing_buttons_diameter = 5;
-drawing_eyes_diameter = 3;
-drawing_lips_thickness = 1;
+drawing_height = 1; // .1
+drawing_buttons_diameter = 5; // .1
+drawing_eyes_diameter = 3; // .1
+drawing_lips_thickness = 1; // .1
 drawing_mood = 1; // [-1:0.1:1]
 drawing_animate_mood = false;
 

@@ -19,15 +19,14 @@ module xor()
 
 module chain_hull_children()
 {
-    if ($children > 1)
+    assert($children >= 2, "chain_hull_children() requires at least 2 children");
+
+    for (i = [0 : $children - 2])
     {
-        for (i = [0 : $children - 2])
+        hull()
         {
-            hull()
-            {
-                children(i);
-                children(i + 1);
-            }
+            children(i);
+            children(i + 1);
         }
     }
 }

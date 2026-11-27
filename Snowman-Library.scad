@@ -65,7 +65,11 @@ module Snowman(
 
     // Validations
     assert($fn == 0 || $fn >= 3, "$fn must be 0 or >= 3");
-    assert(body_height > 0, "body_height must be greater than zero");
+    assert(is_string(body_color) || is_list(body_color), "body_color must be a color name or RGBA list");
+    assert(is_bool(rounding_chamfer), "rounding_chamfer must be a boolean");
+    assert(is_bool(lug_show), "lug_show must be a boolean");
+    assert(is_bool(drawing_show), "drawing_show must be a boolean");
+    assert(body_height > (drawing_show ? delta : 0), str("body_height must be > ", drawing_show ? delta : 0));
     assert(body_base_round_diameter > 0, "body_base_round_diameter must be greater than zero");
     assert(body_bottom_diameter > 0, "body_bottom_diameter must be greater than zero");
     assert(body_medium_diameter > 0, "body_medium_diameter must be greater than zero");
@@ -78,13 +82,14 @@ module Snowman(
     assert(
         !lug_show || (lug_hole_diameter > 0 && lug_hole_diameter < lug_diameter),
         "lug_hole_diameter must be > 0 and < lug_diameter");
-    assert(drawing_height > 0, "drawing_height must be greater than zero");
-    assert(drawing_buttons_diameter > 0, "drawing_buttons_diameter must be greater than zero");
-    assert(drawing_eyes_diameter > 0, "drawing_eyes_diameter must be greater than zero");
+    assert(!drawing_show || is_string(drawing_color) || is_list(drawing_color), "drawing_color must be a color name or RGBA list");
+    assert(!drawing_show || drawing_height > 0, "drawing_height must be greater than zero");
+    assert(!drawing_show || drawing_buttons_diameter > 0, "drawing_buttons_diameter must be greater than zero");
+    assert(!drawing_show || drawing_eyes_diameter > 0, "drawing_eyes_diameter must be greater than zero");
     assert(
-        drawing_lips_thickness > 0 && drawing_lips_thickness < lips_radius_min,
+        !drawing_show || (drawing_lips_thickness > 0 && drawing_lips_thickness < lips_radius_min),
         str("drawing_lips_thickness must be > 0 and < ", lips_radius_min));
-    assert(drawing_mood >= -1 && drawing_mood <= 1, "drawing_mood must be between -1 and 1");
+    assert(!drawing_show || (drawing_mood >= -1 && drawing_mood <= 1), "drawing_mood must be between -1 and 1");
 
     lips_medium_offset = drawing_mood * lips_medium_offset_max;
     drawing_extrude_height = drawing_height + delta;

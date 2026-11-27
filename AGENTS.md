@@ -18,5 +18,4 @@
 ## OpenSCAD Hygiene
 - Import module libraries in [Snowman-Main.scad](Snowman-Main.scad) with `use <...>` rather than `include <...>`.
 - Place any internal or computed variables declared after Customizer parameters under `/* [Hidden] */`.
-- Use `delta` overlap when joining or subtracting shapes to avoid coplanar Z-fighting or manifold issues.
 - Validate all public module parameters with `assert(...)`.

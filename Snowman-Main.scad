@@ -30,7 +30,7 @@ drawing_mood = 1; // [-1:0.1:1]
 drawing_animate_mood = false;
 
 /* [Preview] */
-preview_mode = "normal"; // [normal:Normal Snowman, xor:Compare - XOR (Flat vs Chamfered), flat_minus_chamfer:Compare - Flat minus Chamfered, chamfer_minus_flat:Compare - Chamfered minus Flat]
+preview_mode = "normal"; // [normal:Normal Snowman, mood_trio:Mood Trio - Bad/Normal/Good, xor:Compare - XOR (Flat vs Chamfered), flat_minus_chamfer:Compare - Flat minus Chamfered, chamfer_minus_flat:Compare - Chamfered minus Flat]
 preview_mesh_resolution = 360; // [3:1:720]
 
 /* [Hidden] */
@@ -39,8 +39,16 @@ $fn = preview_mesh_resolution;
 drawing_mood_calculated = drawing_animate_mood
     ? cos(360 * $t)
     : drawing_mood;
+trio_gap = 8;
+trio_spacing_y = max(
+    28 + body_base_round_diameter,
+    body_bottom_diameter,
+    body_medium_diameter,
+    32 + body_hands_diameter,
+    body_head_diameter
+) + trio_gap;
 
-module render_snowman(use_chamfer)
+module render_snowman(use_chamfer, mood = drawing_mood_calculated)
 {
     Snowman(
         // Body
@@ -68,13 +76,22 @@ module render_snowman(use_chamfer)
         drawing_buttons_diameter = drawing_buttons_diameter,
         drawing_eyes_diameter = drawing_eyes_diameter,
         drawing_lips_thickness = drawing_lips_thickness,
-        drawing_mood = drawing_mood_calculated
+        drawing_mood = mood
     );
 }
 
 if (preview_mode == "normal")
 {
     render_snowman(rounding_chamfer);
+}
+else if (preview_mode == "mood_trio")
+{
+    trio_moods = [-1, 0, 1];
+    for (i = [0 : len(trio_moods) - 1])
+    {
+        translate([0, (1 - i) * trio_spacing_y, 0])
+            render_snowman(rounding_chamfer, trio_moods[i]);
+    }
 }
 else if (preview_mode == "xor")
 {

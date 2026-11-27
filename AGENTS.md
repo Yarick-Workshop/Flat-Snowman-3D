@@ -9,7 +9,7 @@
 ## Single Responsibility & Module Separation
 - [Snowman-Library.scad](Snowman-Library.scad) is responsible strictly for drawing the snowman (`module Snowman(...)` and its private sub-modules).
 - Generic CSG helper modules (such as `xor()` and `chain_hull_children()`) must live in [Geometry-Helpers.scad](Geometry-Helpers.scad), not inside [Snowman-Library.scad](Snowman-Library.scad).
-- Preview modes, animation logic (`drawing_animate_mood`), Customizer controls, and geometry comparison modes (`normal`, `xor`, `flat_minus_chamfer`, `chamfer_minus_flat`) belong in [Snowman-Main.scad](Snowman-Main.scad).
+- Preview modes, animation logic (`drawing_animate_mood`), Customizer controls, and geometry comparison modes (`normal`, `mood_trio`, `xor`, `flat_minus_chamfer`, `chamfer_minus_flat`) belong in [Snowman-Main.scad](Snowman-Main.scad).
 
 ## Mesh Resolution & Curves
 - Never hardcode `$fn`, `$fa`, or `$fs` inside library modules. Mesh resolution must come from outside callers ([Snowman-Main.scad](Snowman-Main.scad) or CLI `-D` overrides).

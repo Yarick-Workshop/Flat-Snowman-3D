@@ -39,6 +39,24 @@ module Snowman(
         )
     ) / 2;
 
+    // Internal layout coordinates (hidden from Customizer/callers)
+    base_x = 6;
+    base_y = 14;
+    bottom_x = 20;
+    medium_offset_x = 27;
+    medium_x = bottom_x + medium_offset_x;
+    hands_offset_x = 3;
+    hands_offset_y = 16;
+    head_offset_x = 23;
+    head_x = medium_x + head_offset_x;
+
+    bottom_button_xs = [10, 30];
+    medium_button_x = 50;
+    eyes_offset_x = 3;
+    eyes_offset_y = 5;
+    eyes_x = head_x + eyes_offset_x;
+    lips_x = 65.475;
+
     lips_width = 14.1;
     lips_medium_offset_max = 2.9;
     lips_flat_threshold = 0.001;
@@ -70,6 +88,60 @@ module Snowman(
 
     lips_medium_offset = drawing_mood * lips_medium_offset_max;
     drawing_extrude_height = drawing_height + delta;
+    chamfer_inset = rounding_chamfer ? rounding_size : 0;
+
+    lug_head_overlap = min(delta, (lug_diameter - lug_hole_diameter) / 4);
+    lug_x = min(
+        head_x + body_head_diameter / 2 + lug_hole_diameter / 2,
+        head_x + body_head_diameter / 2 - chamfer_inset + lug_diameter / 2 - lug_head_overlap
+    );
+
+    // TODO: Derive base, snowball, hand, and drawing coordinates dynamically from parameters
+    // (and expose lip dimensions) instead of asserting against hardcoded positions.
+    assert(
+        (body_base_round_diameter + body_bottom_diameter) / 2 - 2 * chamfer_inset > bottom_x - base_x,
+        "base detaches from bottom snowball at current diameters and rounding_size");
+    assert(
+        (body_bottom_diameter + body_medium_diameter) / 2 - 2 * chamfer_inset > medium_offset_x,
+        "bottom snowball detaches from medium snowball at current diameters and rounding_size");
+    assert(
+        (body_medium_diameter + body_hands_diameter) / 2 - 2 * chamfer_inset > norm([hands_offset_x, hands_offset_y]),
+        "hands detach from medium snowball at current diameters and rounding_size");
+    assert(
+        (body_medium_diameter + body_head_diameter) / 2 - 2 * chamfer_inset > head_offset_x,
+        "head detaches from medium snowball at current diameters and rounding_size");
+
+    if (drawing_show)
+    {
+        lips_abs_offset = abs(lips_medium_offset);
+        lips_is_flat = lips_abs_offset < lips_flat_threshold;
+        lips_arc_radius = lips_is_flat ? 0 : (lips_width * lips_width / (8 * lips_abs_offset) + lips_abs_offset / 2);
+        lips_arc_angle = lips_is_flat ? 0 : (atan(lips_width / 2 / (lips_arc_radius - lips_abs_offset)) * 2);
+        lips_arc_offset = lips_is_flat ? 0 : (lips_arc_radius - lips_abs_offset / 2 - (drawing_lips_thickness / 2) * cos(lips_arc_angle / 2));
+        lips_sign = (lips_medium_offset > 0) ? 1 : -1;
+        lips_arc_center_x = lips_x + lips_sign * lips_arc_offset;
+        lips_max_dist_from_head = lips_is_flat
+            ? norm([(head_x - lips_x) + drawing_lips_thickness / 2, lips_width / 2])
+            : max(
+                abs(lips_arc_center_x - lips_sign * lips_arc_radius - head_x),
+                abs(lips_arc_center_x - lips_sign * (lips_arc_radius - drawing_lips_thickness) - head_x),
+                norm([lips_arc_center_x - lips_sign * lips_arc_radius * cos(lips_arc_angle / 2) - head_x, lips_arc_radius * sin(lips_arc_angle / 2)]),
+                norm([lips_arc_center_x - lips_sign * (lips_arc_radius - drawing_lips_thickness) * cos(lips_arc_angle / 2) - head_x, (lips_arc_radius - drawing_lips_thickness) * sin(lips_arc_angle / 2)])
+            );
+
+        assert(
+            max([for (bx = bottom_button_xs) abs(bx - bottom_x)]) + drawing_buttons_diameter / 2 <= body_bottom_diameter / 2 - chamfer_inset,
+            "lower/middle buttons exceed bottom snowball top face");
+        assert(
+            abs(medium_button_x - medium_x) + drawing_buttons_diameter / 2 <= body_medium_diameter / 2 - chamfer_inset,
+            "upper button exceeds medium snowball top face");
+        assert(
+            norm([eyes_x - head_x, eyes_offset_y]) + drawing_eyes_diameter / 2 <= body_head_diameter / 2 - chamfer_inset,
+            "eyes exceed head top face");
+        assert(
+            lips_max_dist_from_head <= body_head_diameter / 2 - chamfer_inset,
+            "lips exceed head top face");
+    }
 
     if (drawing_show)
     {
@@ -77,17 +149,16 @@ module Snowman(
         translate([0, 0, body_height - delta])
         {
             // buttons
-            translate([10, 0, 0])
-                cylinder(h = drawing_extrude_height, d = drawing_buttons_diameter);
-            translate([30, 0, 0])
-                cylinder(h = drawing_extrude_height, d = drawing_buttons_diameter);
-            translate([50, 0, 0])
+            for (bx = bottom_button_xs)
+                translate([bx, 0, 0])
+                    cylinder(h = drawing_extrude_height, d = drawing_buttons_diameter);
+            translate([medium_button_x, 0, 0])
                 cylinder(h = drawing_extrude_height, d = drawing_buttons_diameter);
 
             // eyes
-            translate([73, 5, 0])
+            translate([eyes_x, eyes_offset_y, 0])
                 cylinder(h = drawing_extrude_height, d = drawing_eyes_diameter);
-            translate([73, -5, 0])
+            translate([eyes_x, -eyes_offset_y, 0])
                 cylinder(h = drawing_extrude_height, d = drawing_eyes_diameter);
 
             // lips
@@ -97,46 +168,49 @@ module Snowman(
 
     color(body_color)
     {
-        // lug
-        if (lug_show)
-        translate([82.5, 0, 0])
+        difference()
         {
-            difference()
+            union()
             {
-                cylinder(h = body_height, d = lug_diameter);
-                translate([0, 0, -delta])
-                    cylinder(h = body_height + 2 * delta, d = lug_hole_diameter);
+                // lug
+                if (lug_show)
+                translate([lug_x, 0, 0])
+                    cylinder(h = body_height, d = lug_diameter);
+
+                hull()
+                {
+                    translate([base_x, base_y, 0])
+                        my_cylinder(h = body_height, d = body_base_round_diameter);
+                    translate([base_x, -base_y, 0])
+                        my_cylinder(h = body_height, d = body_base_round_diameter);
+                }
+
+                translate([bottom_x, 0, 0])
+                {
+                    // bottom
+                    my_cylinder(h = body_height, d = body_bottom_diameter);
+
+                    translate([medium_offset_x, 0, 0])
+                    {
+                        // medium
+                        my_cylinder(h = body_height, d = body_medium_diameter);
+
+                        // "hands"
+                        translate([hands_offset_x, hands_offset_y, 0])
+                            my_cylinder(h = body_height, d = body_hands_diameter);
+                        translate([hands_offset_x, -hands_offset_y, 0])
+                            my_cylinder(h = body_height, d = body_hands_diameter);
+
+                        // "head"
+                        translate([head_offset_x, 0, 0])
+                            my_cylinder(h = body_height, d = body_head_diameter);
+                    }
+                }
             }
-        }
 
-        hull()
-        {
-            translate([6, 14, 0])
-                my_cylinder(h = body_height, d = body_base_round_diameter);
-            translate([6, -14, 0])
-                my_cylinder(h = body_height, d = body_base_round_diameter);
-        }
-
-        translate([20, 0, 0])
-        {
-            // bottom
-            my_cylinder(h = body_height, d = body_bottom_diameter);
-
-            translate([27, 0, 0])
-            {
-                // medium
-                my_cylinder(h = body_height, d = body_medium_diameter);
-
-                // "hands"
-                translate([3, 16, 0])
-                    my_cylinder(h = body_height, d = body_hands_diameter);
-                translate([3, -16, 0])
-                    my_cylinder(h = body_height, d = body_hands_diameter);
-
-                // "head"
-                translate([23, 0, 0])
-                    my_cylinder(h = body_height, d = body_head_diameter);
-            }
+            if (lug_show)
+            translate([lug_x, 0, -delta])
+                cylinder(h = body_height + 2 * delta, d = lug_hole_diameter);
         }
     }
 
@@ -162,7 +236,7 @@ module Snowman(
                             square([drawing_lips_thickness, drawing_extrude_height]);
         }
 
-        translate([65.475, 0, 0])
+        translate([lips_x, 0, 0])
         {
             if (abs(lips_medium_offset) < lips_flat_threshold)
             {

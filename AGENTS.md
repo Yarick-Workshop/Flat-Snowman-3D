@@ -1,8 +1,9 @@
 # Project AI Rules
 
 ## OpenSCAD Library & Customizer Parity
-- Every parameter of `module Snowman(...)` in [Snowman-Library.scad](Snowman-Library.scad) must define a default value that matches the corresponding Customizer parameter default in [Snowman-Main.scad](Snowman-Main.scad).
-- Whenever a default value or parameter is added or updated in either [Snowman-Main.scad](Snowman-Main.scad) or [Snowman-Library.scad](Snowman-Library.scad), update the other file in the same change so defaults remain synchronized.
+- Order and group parameters in `module Snowman(...)` in [Snowman-Library.scad](Snowman-Library.scad) (and at its call sites) in the exact same sequence and groupings as the Customizer parameters in [Snowman-Main.scad](Snowman-Main.scad).
+- Never hardcode user-configurable dimensions (heights, diameters, thicknesses, clearances) inside [Snowman-Library.scad](Snowman-Library.scad); expose them as module parameters with synchronized Customizer variables and defaults.
+- Whenever a default value or parameter is added, reordered, or updated in either [Snowman-Main.scad](Snowman-Main.scad) or [Snowman-Library.scad](Snowman-Library.scad), update the other file in the same change.
 
 ## Single Responsibility & Module Separation
 - [Snowman-Library.scad](Snowman-Library.scad) is responsible strictly for drawing the snowman (`module Snowman(...)` and its private sub-modules).
@@ -15,6 +16,6 @@
 
 ## OpenSCAD Hygiene
 - Import module libraries in [Snowman-Main.scad](Snowman-Main.scad) with `use <...>` rather than `include <...>`.
-- Place any internal or computed variables declared after Customizer tabs under `/* [Hidden] */`.
+- Place any internal or computed variables declared after Customizer parameters under `/* [Hidden] */`.
 - Use `delta` overlap when joining or subtracting shapes to avoid coplanar Z-fighting or manifold issues.
 - Validate all public module parameters with `assert(...)`.

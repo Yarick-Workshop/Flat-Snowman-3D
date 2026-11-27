@@ -60,8 +60,11 @@ module Snowman(
     lips_width = 14.1;
     lips_medium_offset_max = 2.9;
     lips_flat_threshold = 0.001;
-    lips_radius_min = lips_width * lips_width / (8 * lips_medium_offset_max) + lips_medium_offset_max / 2;
-    lips_angle_max = atan(lips_width / 2 / (lips_radius_min - lips_medium_offset_max)) * 2;
+    function lips_arc_radius(offset) = lips_width * lips_width / (8 * offset) + offset / 2;
+    function lips_arc_angle(offset, radius) = atan(lips_width / 2 / (radius - offset)) * 2;
+    function lips_arc_offset(offset, radius, angle) = radius - offset / 2 - (drawing_lips_thickness / 2) * cos(angle / 2);
+    lips_radius_min = lips_arc_radius(lips_medium_offset_max);
+    lips_angle_max = lips_arc_angle(lips_medium_offset_max, lips_radius_min);
 
     // Validations
     assert($fn == 0 || $fn >= 3, "$fn must be 0 or >= 3");
@@ -91,15 +94,17 @@ module Snowman(
         str("drawing_lips_thickness must be > 0 and < ", lips_radius_min));
     assert(!drawing_show || (drawing_mood >= -1 && drawing_mood <= 1), "drawing_mood must be between -1 and 1");
 
-    lips_medium_offset = drawing_mood * lips_medium_offset_max;
-    drawing_extrude_height = drawing_height + delta;
+    lips_medium_offset = drawing_show ? drawing_mood * lips_medium_offset_max : 0;
+    drawing_extrude_height = drawing_show ? drawing_height + delta : 0;
     chamfer_inset = rounding_chamfer ? rounding_size : 0;
 
-    lug_head_overlap = min(delta, (lug_diameter - lug_hole_diameter) / 4);
-    lug_x = min(
-        head_x + body_head_diameter / 2 + lug_hole_diameter / 2,
-        head_x + body_head_diameter / 2 - chamfer_inset + lug_diameter / 2 - lug_head_overlap
-    );
+    lug_head_overlap = lug_show ? min(delta, (lug_diameter - lug_hole_diameter) / 4) : 0;
+    lug_x = lug_show
+        ? min(
+            head_x + body_head_diameter / 2 + lug_hole_diameter / 2,
+            head_x + body_head_diameter / 2 - chamfer_inset + lug_diameter / 2 - lug_head_overlap
+        )
+        : 0;
 
     // TODO: Derive base, snowball, hand, and drawing coordinates dynamically from parameters
     // (and expose lip dimensions) instead of asserting against hardcoded positions.
@@ -120,18 +125,18 @@ module Snowman(
     {
         lips_abs_offset = abs(lips_medium_offset);
         lips_is_flat = lips_abs_offset < lips_flat_threshold;
-        lips_arc_radius = lips_is_flat ? 0 : (lips_width * lips_width / (8 * lips_abs_offset) + lips_abs_offset / 2);
-        lips_arc_angle = lips_is_flat ? 0 : (atan(lips_width / 2 / (lips_arc_radius - lips_abs_offset)) * 2);
-        lips_arc_offset = lips_is_flat ? 0 : (lips_arc_radius - lips_abs_offset / 2 - (drawing_lips_thickness / 2) * cos(lips_arc_angle / 2));
+        lips_check_radius = lips_is_flat ? 0 : lips_arc_radius(lips_abs_offset);
+        lips_check_angle = lips_is_flat ? 0 : lips_arc_angle(lips_abs_offset, lips_check_radius);
+        lips_check_offset = lips_is_flat ? 0 : lips_arc_offset(lips_abs_offset, lips_check_radius, lips_check_angle);
         lips_sign = (lips_medium_offset > 0) ? 1 : -1;
-        lips_arc_center_x = lips_x + lips_sign * lips_arc_offset;
+        lips_arc_center_x = lips_x + lips_sign * lips_check_offset;
         lips_max_dist_from_head = lips_is_flat
             ? norm([(head_x - lips_x) + drawing_lips_thickness / 2, lips_width / 2])
             : max(
-                abs(lips_arc_center_x - lips_sign * lips_arc_radius - head_x),
-                abs(lips_arc_center_x - lips_sign * (lips_arc_radius - drawing_lips_thickness) - head_x),
-                norm([lips_arc_center_x - lips_sign * lips_arc_radius * cos(lips_arc_angle / 2) - head_x, lips_arc_radius * sin(lips_arc_angle / 2)]),
-                norm([lips_arc_center_x - lips_sign * (lips_arc_radius - drawing_lips_thickness) * cos(lips_arc_angle / 2) - head_x, (lips_arc_radius - drawing_lips_thickness) * sin(lips_arc_angle / 2)])
+                abs(lips_arc_center_x - lips_sign * lips_check_radius - head_x),
+                abs(lips_arc_center_x - lips_sign * (lips_check_radius - drawing_lips_thickness) - head_x),
+                norm([lips_arc_center_x - lips_sign * lips_check_radius * cos(lips_check_angle / 2) - head_x, lips_check_radius * sin(lips_check_angle / 2)]),
+                norm([lips_arc_center_x - lips_sign * (lips_check_radius - drawing_lips_thickness) * cos(lips_check_angle / 2) - head_x, (lips_check_radius - drawing_lips_thickness) * sin(lips_check_angle / 2)])
             );
 
         assert(
@@ -141,8 +146,14 @@ module Snowman(
             abs(medium_button_x - medium_x) + drawing_buttons_diameter / 2 <= body_medium_diameter / 2 - chamfer_inset,
             "upper button exceeds medium snowball top face");
         assert(
+            drawing_buttons_diameter < min(bottom_button_xs[1] - bottom_button_xs[0], medium_button_x - bottom_button_xs[1]),
+            "buttons touch or overlap each other");
+        assert(
             norm([eyes_x - head_x, eyes_offset_y]) + drawing_eyes_diameter / 2 <= body_head_diameter / 2 - chamfer_inset,
             "eyes exceed head top face");
+        assert(
+            drawing_eyes_diameter < 2 * eyes_offset_y,
+            "eyes touch or overlap each other");
         assert(
             lips_max_dist_from_head <= body_head_diameter / 2 - chamfer_inset,
             "lips exceed head top face");
@@ -223,9 +234,9 @@ module Snowman(
     {
         module lips_arc(offset)
         {
-            lips_radius = lips_width * lips_width / (8 * offset) + offset / 2;
-            lips_angle = atan(lips_width / 2 / (lips_radius - offset)) * 2;
-            lips_offset = lips_radius - offset / 2 - (drawing_lips_thickness / 2) * cos(lips_angle / 2);
+            lips_radius = lips_arc_radius(offset);
+            lips_angle = lips_arc_angle(offset, lips_radius);
+            lips_offset = lips_arc_offset(offset, lips_radius, lips_angle);
 
             arc_fn = ($fn > 0)
                 ? ceil(max($fn * lips_angle_max / lips_angle, 3 * 360 / lips_angle))
